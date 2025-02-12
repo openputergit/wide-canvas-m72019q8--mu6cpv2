@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कपड़ों की दुकान - क्रेडिट नोट सिस्टम</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .print-only {
+            display: none;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            .print-only {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">क्रेडिट नोट जनरेटर</h1>
+                <div class="print-only text-right">
+                    <p class="text-sm">क्रेडिट नोट नंबर: <span id="creditNoteNumberPrint"></span></p>
+                    <p class="text-sm">दिनांक: <span id="datePrint"></span></p>
+                </div>
+            </div>
+
+            <form id="creditNoteForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">ग्राहक का नाम</label>
+                        <input type="text" id="customerName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">मोबाइल नंबर</label>
+                        <input type="tel" id="phoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-lg font-medium text-gray-700">वस्तुएं</h3>
+                    <div id="itemsList" class="space-y-2">
+                        <!-- Items will be added here -->
+                    </div>
+                    <button type="button" onclick="addItem()" class="text-blue-600 hover:text-blue-800 no-print">
+                        <i class="bi bi-plus-circle"></i> नई वस्तु जोड़ें
+                    </button>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                    <div class="text-lg font-bold">
+                        कुल राशि: ₹<span id="totalAmount">0.00</span>
+                    </div>
+                    <div class="space-x-2 no-print">
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            जनरेट करें
+                        </button>
+                        <button type="button" onclick="printCreditNote()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700">
+                            प्रिंट करें
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let itemCount = 0;
+
+        function addItem() {
+            itemCount++;
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'grid grid-cols-12 gap-2';
+            itemDiv.innerHTML = `
+                <div class="col-span-5">
+                    <input type="text" placeholder="वस्तु का नाम" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="col-span-2">
+                    <input type="number" placeholder="मात्रा" class="w-full p-2 border rounded" oninput="calculateTotal()" required>
+                </div>
+                <div class="col-span-3">
+                    <input type="number" placeholder="कीमत" class="w-full p-2 border rounded" oninput="calculateTotal()" required>
+                </div>
+                <div class="col-span-2">
+                    <button type="button" onclick="removeItem(this)" class="text-red-600 hover:text-red-800 no-print">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            document.getElementById('itemsList').appendChild(itemDiv);
+        }
+
+        function removeItem(button) {
+            button.closest('.grid').remove();
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            const items = document.getElementById('itemsList').getElementsByClassName('grid');
+            Array.from(items).forEach(item => {
+                const quantity = Number(item.getElementsByTagName('input')[1].value) || 0;
+                const price = Number(item.getElementsByTagName('input')[2].value) || 0;
+                total += quantity * price;
+            });
+            document.getElementById('totalAmount').textContent = total.toFixed(2);
+        }
+
+        function printCreditNote() {
+            document.getElementById('creditNoteNumberPrint').textContent = 'CN' + Date.now();
+            document.getElementById('datePrint').textContent = new Date().toLocaleDateString();
+            window.print();
+        }
+
+        // Add first item by default
+        addItem();
+
+        document.getElementById('creditNoteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Here you can add code to save the credit note data
+            alert('क्रेडिट नोट सफलतापूर्वक जनरेट किया गया!');
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
